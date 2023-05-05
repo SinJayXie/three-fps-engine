@@ -1,5 +1,5 @@
 import SceneController from "./SceneController";
-import {Group, Object3D, sRGBEncoding, WebGLRenderer} from "three";
+import {Clock, Group, Object3D, sRGBEncoding, WebGLRenderer} from "three";
 import CameraController from "./CameraController";
 import RenderRect from "./RenderRect";
 import WorldPhysics from "./WorldPhysics";
@@ -17,6 +17,8 @@ class CoreEngine {
     private isStart: boolean;
     private readonly renderRect: RenderRect;
     private readonly models: Group;
+    private readonly clock: Clock;
+    private deltaTime: number;
 
 
     constructor(bindElement: HTMLElement) {
@@ -28,7 +30,9 @@ class CoreEngine {
         this.keyState = new KeyState()
         this.worldPhysics = new WorldPhysics(this.keyState, this.scene.getScene(), this.camera.getCamera())
         this.models = new Group()
+        this.clock = new Clock()
         this.isStart = false
+        this.deltaTime = 0
         this.callback = function (){}
         this.initEngine()
     }
@@ -52,6 +56,10 @@ class CoreEngine {
         return true
     }
 
+    public getDeltaTime() {
+        return this.deltaTime
+    }
+
 
     public getSize() {
         return this.renderRect.getSize()
@@ -67,6 +75,7 @@ class CoreEngine {
 
     private _loop(this_: any) {
         this.renderer.setAnimationLoop(() => {
+            this.deltaTime = this.clock.getDelta()
             this.worldPhysics.update()
             this.camera.update()
             this.callback.call(this_, this)

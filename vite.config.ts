@@ -5,7 +5,8 @@ export default defineConfig({
     lib: {
       entry: './lib/main.ts',
       name: 'ThreeFpsEngine',
-      fileName: 'fps-engine'
+      fileName: 'fps-engine',
+      formats: ['es', 'cjs', 'umd', 'iife']
     }
   }
 })

@@ -7,6 +7,8 @@ import {
     // TextureLoader
 } from "three";
 
+import MeshController from "./MeshController";
+
 export interface TextureConfig {
     width?: number,
     height?: number
@@ -29,13 +31,13 @@ class ModelGenerate {
     public static box(width?: number, height?: number, depth?: number, widthSegments?: number, heightSegments?: number, depthSegments?: number) {
         const geometry = new BoxGeometry(width, height, depth, widthSegments, heightSegments, depthSegments)
         const material = new MeshBasicMaterial({ color: 0xffffff })
-        return new Mesh(geometry, material)
+        return new MeshController(new Mesh(geometry, material))
     }
 
     public static sphere(radius?: number, detail?: number, color?: ColorRepresentation) {
         const geometry = new IcosahedronGeometry(radius || 1, detail || 0)
         const material = new MeshBasicMaterial({ color })
-        return new Mesh(geometry, material)
+        return new MeshController(new Mesh(geometry, material))
     }
 
     /**
@@ -54,7 +56,7 @@ class ModelGenerate {
         const grass = new Mesh(geometry, material)
         grass.rotation.x = -0.5 * Math.PI;
 
-        return grass
+        return new MeshController(grass)
     }
 }
 

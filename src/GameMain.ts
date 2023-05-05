@@ -1,5 +1,4 @@
-import { CoreEngine, ModelGenerate } from "../lib/main"
-import { Vector3 } from "three";
+import { CoreEngine, ModelGenerate, THREE } from "../lib/main"
 
 class GameMain {
     private readonly container: HTMLElement;
@@ -16,8 +15,8 @@ class GameMain {
         this.contentElement.classList.add("fps-engine-frame")
         this.container.appendChild(this.contentElement)
         const mesh = ModelGenerate.plane(10, 10)
-        mesh.position.y = -1
-        this.engine.addMesh(mesh, true)
+        mesh.setPosition(new THREE.Vector3(0, -1, 0))
+        this.engine.addMesh(mesh.getObject(), true)
 
         this.engine.camera.setFov(45)
         setTimeout(() => {
@@ -32,7 +31,7 @@ class GameMain {
 
 
         if(this.engine.worldPhysics.getPosition().y < -20) {
-            this.engine.worldPhysics.resetPosition(new Vector3())
+            this.engine.worldPhysics.resetPosition(new THREE.Vector3())
         }
     }
 

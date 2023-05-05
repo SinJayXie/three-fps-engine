@@ -1,13 +1,12 @@
 使用方法
 
 ``` typescript
-import { CoreEngine, ModelGenerate, THREE } from "three-fps-engine"
+import { CoreEngine, ModelGenerate, THREE } from "../lib/main"
 
 class GameMain {
     private readonly container: HTMLElement;
     private contentElement: HTMLDivElement;
     private readonly engine: CoreEngine;
-    
     constructor(el: HTMLElement) {
         this.container = el
         this.contentElement = document.createElement('div')
@@ -19,8 +18,8 @@ class GameMain {
         this.contentElement.classList.add("fps-engine-frame")
         this.container.appendChild(this.contentElement)
         const mesh = ModelGenerate.plane(10, 10)
-        mesh.position.y = -1
-        this.engine.addMesh(mesh, true)
+        mesh.setPosition(new THREE.Vector3(0, -1, 0))
+        this.engine.addMesh(mesh.getObject(), true)
 
         this.engine.camera.setFov(45)
         setTimeout(() => {
@@ -44,3 +43,4 @@ class GameMain {
 
 
 export default GameMain
+
