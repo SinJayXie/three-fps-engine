@@ -23,7 +23,7 @@ class CoreEngine {
         this.container = bindElement
         this.scene = new SceneController()
         this.renderer = new WebGLRenderer()
-        this.camera = new CameraController(this.container)
+        this.camera = new CameraController(this.container, 45)
         this.renderRect = new RenderRect(bindElement, this.renderer, this.camera.getCamera())
         this.keyState = new KeyState()
         this.worldPhysics = new WorldPhysics(this.keyState, this.scene.getScene(), this.camera.getCamera())
@@ -31,6 +31,14 @@ class CoreEngine {
         this.isStart = false
         this.callback = function (){}
         this.initEngine()
+    }
+
+
+    /**
+     * 获取按键类
+     */
+    public getKeyState() {
+        return this.keyState
     }
 
     public start(callback: () => void, this_: any) {
@@ -42,6 +50,11 @@ class CoreEngine {
         this.worldPhysics.createOctree()
         this._loop(this_)
         return true
+    }
+
+
+    public getSize() {
+        return this.renderRect.getSize()
     }
 
     public addMesh(objects: Object3D, isCollider?: Boolean) {

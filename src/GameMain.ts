@@ -1,5 +1,5 @@
 import { CoreEngine, ModelGenerate } from "../lib/main"
-import {Vector3} from "three";
+import { Vector3 } from "three";
 
 class GameMain {
     private readonly container: HTMLElement;
@@ -18,7 +18,12 @@ class GameMain {
         const mesh = ModelGenerate.plane(10, 10)
         mesh.position.y = -1
         this.engine.addMesh(mesh, true)
-        this.engine.start(this.update, this)
+
+        this.engine.camera.setFov(45)
+        setTimeout(() => {
+            this.engine.camera.setAspect(this.engine.getSize().height / this.engine.getSize().width)
+            this.engine.start(this.update, this)
+        }, 10)
     }
 
 

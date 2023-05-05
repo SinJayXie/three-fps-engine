@@ -1,10 +1,11 @@
 {
   "name": "three-fps-engine",
   "private": false,
-  "version": "0.0.1",
+  "version": "0.0.2b1",
   "type": "module",
   "author": "dishuyl",
   "description": "a three fps engine",
+  "license": "MIT",
   "keywords": [
     "fps",
     "three",
@@ -13,24 +14,37 @@
   ],
   "files": [
     "dist/*",
-    "index.d.ts"
+    "lib/*",
+    "index.d.ts",
+    "types",
+    "README.md"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SinJayXie/three-fps-engine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SinJayXie/three-fps-engine/issues",
+    "email": "836197970@qq.com"
+  },
   "main": "./dist/fps-engine.umd.cjs",
   "module": "./dist/fps-engine.js",
   "types": "./index.d.ts",
   "exports": {
     "types": "./index.d.ts",
-    "import": "./dist/counter.js",
-    "require": "./dist/counter.umd.cjs"
+    "import": "./dist/fps-engine.js",
+    "require": "./dist/fps-engine.umd.cjs"
   },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build"
   },
+  "dependencies": {
+    "three": "^0.152.2"
+  },
   "devDependencies": {
     "@types/three": "^0.151.0",
     "sass": "^1.62.1",
-    "three": "^0.152.2",
     "typescript": "^4.9.4",
     "vite": "^4.0.4"
   }

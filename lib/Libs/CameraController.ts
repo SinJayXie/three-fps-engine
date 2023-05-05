@@ -54,6 +54,53 @@ class CameraController {
         return this.camera.position.clone()
     }
 
+    /**
+     * 设置视角
+     * @param fov
+     */
+    public setFov(fov: number) {
+        this.camera.fov = fov
+        return this
+    }
+
+    /**
+     * 获取视角
+     */
+    public getFov() {
+        return this.camera.fov
+    }
+
+    /**
+     * 设置渲染距离
+     * @param far
+     */
+    public setFar(far: number) {
+        this.camera.far = far
+        return this
+    }
+
+    /**
+     * 获取渲染距离
+     */
+    public getFar() {
+        return this.camera.far
+    }
+
+    /**
+     * 设置相机方位
+     */
+    public setAspect(aspect: number) {
+        this.camera.aspect = aspect
+        return this
+    }
+
+    /**
+     * 获取相机方位
+     */
+    public getAspect() {
+        return this.camera.aspect
+    }
+
 
     public update() {
         const quaternion = new Quaternion();
