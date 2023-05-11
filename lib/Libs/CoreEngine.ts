@@ -4,10 +4,11 @@ import CameraController from "./CameraController";
 import RenderRect from "./RenderRect";
 import WorldPhysics from "./WorldPhysics";
 import KeyState from "./KeyState";
+import CanvasRender from "./CanvasRender";
 
 class CoreEngine {
     public scene: SceneController;
-    public readonly camera: CameraController;
+    public camera: CameraController;
     public worldPhysics: WorldPhysics;
     public keyState: KeyState;
 
@@ -19,14 +20,16 @@ class CoreEngine {
     private readonly models: Group;
     private readonly clock: Clock;
     private deltaTime: number;
+    private readonly drawCanvas: CanvasRender;
 
 
     constructor(bindElement: HTMLElement) {
         this.container = bindElement
+        this.drawCanvas = new CanvasRender()
         this.scene = new SceneController()
         this.renderer = new WebGLRenderer()
-        this.camera = new CameraController(this.container, 45)
-        this.renderRect = new RenderRect(bindElement, this.renderer, this.camera.getCamera())
+        this.camera = new CameraController(this.container, this, 45)
+        this.renderRect = new RenderRect(bindElement, this.renderer, this.camera.getCamera(), this.drawCanvas)
         this.keyState = new KeyState()
         this.worldPhysics = new WorldPhysics(this.keyState, this.scene.getScene(), this.camera.getCamera())
         this.models = new Group()
@@ -37,6 +40,24 @@ class CoreEngine {
         this.initEngine()
     }
 
+    public getWorldMesh(object: Object3D, filterType?: string[]) {
+        const meshList = []
+        meshList.push(object)
+        object.children.forEach(item => {
+            meshList.push(...this.getWorldMesh(item))
+        })
+        if(filterType) {
+            return meshList.filter(item => filterType.includes(item.type))
+         } else {
+            return meshList
+        }
+    }
+
+
+    public getCanvasContent() {
+        return this.drawCanvas
+    }
+
 
     /**
      * 获取按键类
@@ -45,6 +66,11 @@ class CoreEngine {
         return this.keyState
     }
 
+    /**
+     * 引擎开始
+     * @param callback
+     * @param this_
+     */
     public start(callback: () => void, this_: any) {
         if(this.isStart) return false
         this.callback = callback
@@ -52,24 +78,50 @@ class CoreEngine {
         this.container.appendChild(this.renderer.domElement)
         this.renderRect.updateSize()
         this.worldPhysics.createOctree()
+        this.drawCanvas.init(this.container.getBoundingClientRect(), this.container)
         this._loop(this_)
         return true
     }
 
+    /**
+     * 获取增量时间
+     */
     public getDeltaTime() {
         return this.deltaTime
     }
 
 
+    /**
+     * 获取窗口大小
+     */
     public getSize() {
         return this.renderRect.getSize()
     }
 
+    /**
+     * 添加Mesh到scene
+     * @param objects
+     * @param isCollider
+     */
     public addMesh(objects: Object3D, isCollider?: Boolean) {
         if(isCollider) {
             this.worldPhysics.add(objects)
         } else {
             this.models.add(objects)
+        }
+    }
+
+
+    /**
+     * 删除Mesh到scene
+     * @param objects
+     * @param isCollider
+     */
+    public removeMesh(objects: Object3D, isCollider?: Boolean) {
+        if(isCollider) {
+            this.worldPhysics.remove(objects)
+        } else {
+            this.models.remove(objects)
         }
     }
 
@@ -80,11 +132,17 @@ class CoreEngine {
             this.camera.update()
             this.callback.call(this_, this)
             this.render()
+            this.drawCanvas.update()
+
             this._loop(this_)
         })
     }
 
 
+    /**
+     * 初始化引擎配置
+     * @private
+     */
     private initEngine() {
         this.renderer.outputEncoding = sRGBEncoding  // 切换渲染输出格式
         this.scene.add(this.models)
@@ -104,6 +162,16 @@ class CoreEngine {
      */
     public switchScene(scene: SceneController) {
         this.scene = scene
+        return this
+    }
+
+    /**
+     * 切换相机
+     * @param camera
+     */
+    public switchCamera(camera: CameraController) {
+        this.camera = camera
+        return this
     }
 
 

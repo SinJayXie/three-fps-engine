@@ -1,5 +1,5 @@
 import "./style.scss"
-import GameMain from "./GameMain";
+import GameMain from "./Crossfire/GameMain";
 
 const documentElement = <HTMLDivElement>document.querySelector("#app")
 

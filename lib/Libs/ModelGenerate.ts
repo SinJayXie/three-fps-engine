@@ -52,7 +52,7 @@ class ModelGenerate {
         // texture_.wrapT = RepeatWrapping
         // texture_.wrapS = RepeatWrapping
         // texture_.repeat.set(texture.width || 100, texture.height || 100)
-        const material = new MeshBasicMaterial({  })
+        const material = new MeshBasicMaterial({ transparent: true, color: 0xffffff })
         const grass = new Mesh(geometry, material)
         grass.rotation.x = -0.5 * Math.PI;
 

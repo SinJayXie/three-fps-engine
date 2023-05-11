@@ -1,15 +1,18 @@
-import {Euler, PerspectiveCamera, Quaternion, Vector3} from "three";
+import {Euler, Object3D, PerspectiveCamera, Quaternion, Vector3} from "three";
 import {PointerLockControls} from "three/examples/jsm/controls/PointerLockControls";
+import CoreEngine from "./CoreEngine";
 
 class CameraController {
     private readonly camera: PerspectiveCamera;
     private readonly element: HTMLElement;
     private readonly controls: PointerLockControls;
     public globalRotation: Euler;
-    constructor(element: HTMLElement ,fov?: number, aspect?: number, near?: number, far?: number) {
+    private engine: CoreEngine;
+    constructor(element: HTMLElement, engine: CoreEngine ,fov?: number, aspect?: number, near?: number, far?: number) {
         this.element = element
         this.camera = new PerspectiveCamera(fov, aspect, near, far)
         this.controls = new PointerLockControls(this.camera, element)
+        this.engine = engine
         this.globalRotation = new Euler()
         this.init_()
     }
@@ -17,7 +20,7 @@ class CameraController {
 
     private init_() {
         this.element.addEventListener('click', () => {
-            this.controls.lock()
+            if(!this.engine.getCanvasContent().UILayer.getHasHover()) this.controls.lock()
         })
     }
 
@@ -35,6 +38,12 @@ class CameraController {
      */
     public getCamera() {
         return this.camera
+    }
+
+
+    public lookAt(v: Vector3) {
+        this.camera.lookAt(v)
+        return this
     }
 
     /**
@@ -106,6 +115,16 @@ class CameraController {
         const quaternion = new Quaternion();
         quaternion.copy(this.camera.quaternion).normalize();
         this.globalRotation = new Euler().setFromQuaternion(quaternion, 'YXZ');
+    }
+
+
+    /**
+     * 绑定模型到相机盒子
+     * @param object
+     */
+    public bindObject(object: Object3D) {
+        this.camera.add(object)
+        return this
     }
 
 

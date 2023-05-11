@@ -1,7 +1,7 @@
 import {Octree} from "three/examples/jsm/math/Octree";
 import {OctreeHelper} from "three/examples/jsm/helpers/OctreeHelper";
 import {Capsule} from "three/examples/jsm/math/Capsule";
-import {Clock, Group, Object3D, PerspectiveCamera, Scene, Vector3} from "three";
+import {Clock, Color, Group, Object3D, PerspectiveCamera, Scene, Vector3} from "three";
 import KeyState from "./KeyState";
 import PhysicsConfig from "./PhysicsConfig";
 
@@ -42,11 +42,33 @@ class WorldPhysics {
         this.isInit = true
         this.scene.add(this.colliders)
         this.reload()
+        this.worldTreeHelper.visible = false
         this.scene.add(this.worldTreeHelper)
     }
 
     public setConfig(config: PhysicsConfig) {
         this.config = config
+    }
+
+    public clear() {
+        this.colliders.children.forEach(object => {
+            this.colliders.remove(object)
+        })
+        this.worldTree.triangles = []
+        this.worldTree.subTrees = []
+        // this.worldTree.build()
+    }
+
+    public hideHelper() {
+        this.worldTreeHelper.visible = false
+    }
+
+    public showHelper() {
+        this.worldTreeHelper.visible = true
+    }
+
+    public setHelperColor(color: Color | string | number) {
+        this.worldTreeHelper.color = color
     }
 
     public resetPosition(pos: Vector3) {
@@ -55,6 +77,15 @@ class WorldPhysics {
         this.playerVelocity.set(0, 0, 0)
         this.playerCollider.start.set(newPos.x, newPos.y, newPos.z)
         this.playerCollider.end.set(newPos.x, newPos.y + height, newPos.z)
+    }
+
+    public updateObject(obj?: Object3D) {
+        if(obj) {
+            obj.position.copy(this.playerCollider.end)
+        } else {
+            this.camera.position.copy(this.playerCollider.end)
+
+        }
     }
 
     public update() {
@@ -91,7 +122,7 @@ class WorldPhysics {
         if(!isY) this.playerDirection.y = 0;
         this.playerDirection.normalize();
 
-        return this.playerDirection;
+        return this.playerDirection.clone();
 
     }
 
@@ -118,9 +149,16 @@ class WorldPhysics {
         this.colliders.remove(object)
     }
 
-    public reload() {
+    public reload(isUpdate?: boolean) {
+        if(isUpdate) {
+            this.worldTree.fromGraphNode(this.colliders)
+            this.worldTreeHelper.update()
+            return true
+        }
         if(this.colliders.children.length > 0) this.worldTree.fromGraphNode(this.colliders)
+
         this.worldTreeHelper.update()
+        return true
     }
 
     private playerCollisions() {
@@ -136,6 +174,11 @@ class WorldPhysics {
 
     public testCollisions(capsule: Capsule) {
         return this.worldTree.capsuleIntersect(capsule)
+    }
+
+
+    public getColliders() {
+        return this.colliders.children
     }
 }
 

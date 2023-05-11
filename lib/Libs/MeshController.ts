@@ -1,5 +1,16 @@
-import {AnimationAction, AnimationClip, AnimationMixer, Euler, Mesh, Object3D, Quaternion, Vector3} from "three";
-
+import {
+    AnimationAction,
+    AnimationClip,
+    AnimationMixer,
+    Euler,
+    Mesh,
+    Object3D,
+    Quaternion, RepeatWrapping, Texture,
+    TextureLoader,
+    Vector3
+} from "three";
+const EMPTY_ANIMATION = new AnimationClip("none", 1, [])
+const textureMap = <Map<string, Texture>>new Map()
 class MeshController {
     private readonly object: Object3D;
     private readonly animations: AnimationClip[];
@@ -10,7 +21,7 @@ class MeshController {
         this.object = <Object3D>mesh
         this.animations = mesh.animations
         this.mixer = new AnimationMixer(this.object)
-        this.animationAction = this.mixer.clipAction(this.animations[0] || new AnimationClip())
+        this.animationAction = this.mixer.clipAction(this.animations[0] || EMPTY_ANIMATION)
         this.currentActionName = ""
     }
 
@@ -52,7 +63,7 @@ class MeshController {
      */
     public selectAnimation(animation: AnimationClip, timeScale?: number) {
         this.mixer.stopAllAction()
-        this.animationAction = this.mixer.clipAction(animation || new AnimationClip())
+        this.animationAction = this.mixer.clipAction(animation || EMPTY_ANIMATION)
         this.animationAction.setDuration(0)
         this.animationAction.timeScale = timeScale ? timeScale : 1
         this.animationAction.play()
@@ -115,6 +126,47 @@ class MeshController {
     public getObject() {
         return <Mesh>this.object
     }
+
+    public bindMesh(object: Object3D) {
+        this.object.add(object)
+    }
+
+
+    public async setTexture(textureName: string, width?: number, height?: number): Promise<Texture> {
+        const mesh = <any>this.object
+        if(textureMap.has(textureName)) {
+            return new Promise(resolve => {
+                const texture = new Texture().copy(<Texture>textureMap.get(textureName))
+                if(width && height) {
+                    texture.wrapT = RepeatWrapping
+                    texture.wrapS = RepeatWrapping
+                    texture.repeat.set(width || 100, height || 100)
+                }
+                mesh.material.map = texture
+                resolve(<Texture>mesh.material.map)
+            })
+        }
+
+        return new Promise((resolve, reject) => {
+            new TextureLoader().setPath("/textures/").load(textureName, texture_ => {
+                const texture = new Texture().copy(texture_)
+
+                if(width && height) {
+                    texture.wrapT = RepeatWrapping
+                    texture.wrapS = RepeatWrapping
+                    texture.repeat.set(width || 100, height || 100)
+                }
+                // mesh.material.color = new Color(0x000000)
+
+                mesh.material.map = new Texture().copy(texture)
+                textureMap.set(textureName, texture)
+                resolve(<Texture>mesh.material.map)
+            }, () => {}, event => {
+                reject(event)
+            })
+        })
+    }
+
 
 }
 
